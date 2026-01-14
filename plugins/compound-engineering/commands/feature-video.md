@@ -22,11 +22,16 @@ This command creates professional video walkthroughs of features for PR document
 
 <requirements>
 - Local development server running (e.g., `bin/dev`, `rails server`)
-- Playwright MCP server connected
+- `agent-browser` CLI installed (`npm install -g agent-browser && agent-browser install`)
 - Git repository with a PR to document
 - `ffmpeg` installed (for video conversion)
 - `rclone` configured (optional, for cloud upload - see rclone skill)
 </requirements>
+
+**Load the agent-browser skill first:**
+```
+skill: agent-browser
+```
 
 ## Main Tasks
 
@@ -113,33 +118,17 @@ Does this look right?
 
 <setup_recording>
 
-**Create videos directory:**
+**Create directories:**
 ```bash
-mkdir -p tmp/videos
+mkdir -p tmp/videos tmp/screenshots
 ```
 
-**Start browser with video recording using Playwright MCP:**
+**Approach: Use browser screenshots as frames**
 
-Note: Playwright MCP's browser_navigate will be used, and we'll use browser_run_code to enable video recording:
-
-```javascript
-// Enable video recording context
-mcp__plugin_compound-engineering_pw__browser_run_code({
-  code: `async (page) => {
-    // Video recording is enabled at context level
-    // The MCP server handles this automatically
-    return 'Video recording active';
-  }`
-})
-```
-
-**Alternative: Use browser screenshots as frames**
-
-If video recording isn't available via MCP, fall back to:
-1. Take screenshots at key moments
-2. Combine into a GIF using ffmpeg
+Take screenshots at key moments during the walkthrough, then combine them into a video/GIF using ffmpeg.
 
 ```bash
+# After taking screenshots with agent-browser screenshot:
 ffmpeg -framerate 2 -pattern_type glob -i 'tmp/screenshots/*.png' -vf "scale=1280:-1" tmp/videos/feature-demo.gif
 ```
 
@@ -152,54 +141,49 @@ ffmpeg -framerate 2 -pattern_type glob -i 'tmp/screenshots/*.png' -vf "scale=128
 Execute the planned flow, capturing each step:
 
 **Step 1: Navigate to starting point**
-```
-mcp__plugin_compound-engineering_pw__browser_navigate({ url: "[base-url]/[start-route]" })
-mcp__plugin_compound-engineering_pw__browser_wait_for({ time: 2 })
-mcp__plugin_compound-engineering_pw__browser_take_screenshot({ filename: "tmp/screenshots/01-start.png" })
+```bash
+agent-browser open [base-url]/[start-route]
+agent-browser wait 2000
+agent-browser screenshot tmp/screenshots/01-start.png
 ```
 
 **Step 2: Perform navigation/interactions**
-```
-mcp__plugin_compound-engineering_pw__browser_click({ element: "[description]", ref: "[ref]" })
-mcp__plugin_compound-engineering_pw__browser_wait_for({ time: 1 })
-mcp__plugin_compound-engineering_pw__browser_take_screenshot({ filename: "tmp/screenshots/02-navigate.png" })
+```bash
+agent-browser snapshot -i --json
+agent-browser click @[ref]
+agent-browser wait 1000
+agent-browser screenshot tmp/screenshots/02-navigate.png
 ```
 
 **Step 3: Demonstrate feature**
-```
-mcp__plugin_compound-engineering_pw__browser_snapshot({})
-// Identify interactive elements
-mcp__plugin_compound-engineering_pw__browser_click({ element: "[feature element]", ref: "[ref]" })
-mcp__plugin_compound-engineering_pw__browser_wait_for({ time: 1 })
-mcp__plugin_compound-engineering_pw__browser_take_screenshot({ filename: "tmp/screenshots/03-feature.png" })
+```bash
+agent-browser snapshot -i --json
+# Identify interactive elements from refs
+agent-browser click @[feature-ref]
+agent-browser wait 1000
+agent-browser screenshot tmp/screenshots/03-feature.png
 ```
 
 **Step 4: Capture result**
-```
-mcp__plugin_compound-engineering_pw__browser_wait_for({ time: 2 })
-mcp__plugin_compound-engineering_pw__browser_take_screenshot({ filename: "tmp/screenshots/04-result.png" })
+```bash
+agent-browser wait 2000
+agent-browser screenshot tmp/screenshots/04-result.png
 ```
 
 **Create video/GIF from screenshots:**
 
 ```bash
-# Create directories
-mkdir -p tmp/videos tmp/screenshots
-
 # Create MP4 video (RECOMMENDED - better quality, smaller size)
 # -framerate 0.5 = 2 seconds per frame (slower playback)
 # -framerate 1 = 1 second per frame
-ffmpeg -y -framerate 0.5 -pattern_type glob -i '.playwright-mcp/tmp/screenshots/*.png' \
+ffmpeg -y -framerate 0.5 -pattern_type glob -i 'tmp/screenshots/*.png' \
   -c:v libx264 -pix_fmt yuv420p -vf "scale=1280:-2" \
   tmp/videos/feature-demo.mp4
 
 # Create low-quality GIF for preview (small file, for GitHub embed)
-ffmpeg -y -framerate 0.5 -pattern_type glob -i '.playwright-mcp/tmp/screenshots/*.png' \
+ffmpeg -y -framerate 0.5 -pattern_type glob -i 'tmp/screenshots/*.png' \
   -vf "scale=640:-1:flags=lanczos,split[s0][s1];[s0]palettegen=max_colors=128[p];[s1][p]paletteuse" \
   -loop 0 tmp/videos/feature-demo-preview.gif
-
-# Copy screenshots to project folder for easy access
-cp -r .playwright-mcp/tmp/screenshots tmp/
 ```
 
 **Note:**

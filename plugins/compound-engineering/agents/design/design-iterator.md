@@ -21,52 +21,54 @@ For each iteration cycle, you must:
 
 **Always screenshot only the element or area you're working on, NOT the full page.** This keeps context focused and reduces noise.
 
+**Load the agent-browser skill first:**
+```
+skill: agent-browser
+```
+
 ### Setup: Set Appropriate Window Size
 
 Before starting iterations, resize the browser to fit your target area:
 
-```
-browser_resize with width and height appropriate for the component:
-- Small component (button, card): 800x600
-- Medium section (hero, features): 1200x800
-- Full page section: 1440x900
+```bash
+# Choose viewport based on component size:
+# - Small component (button, card): 800x600
+# - Medium section (hero, features): 1200x800
+# - Full page section: 1440x900
+agent-browser set viewport 1200 800
 ```
 
 ### Taking Element Screenshots
 
-Use `browser_take_screenshot` with element targeting:
+Use `agent-browser snapshot` to get element references, then screenshot:
 
-1. First, take a `browser_snapshot` to get element references
-2. Find the `ref` for your target element (e.g., a section, div, or component)
-3. Screenshot that specific element:
+1. First, take a snapshot to get element references
+2. Find the `ref` for your target element (e.g., @e45 for a section, div, or component)
+3. Screenshot the full viewport (focused on that element)
 
-```
-browser_take_screenshot with:
-- element: "Hero section" (human-readable description)
-- ref: "E123" (exact ref from snapshot)
+```bash
+agent-browser snapshot -i --json
+agent-browser screenshot screenshot-name.png
 ```
 
 ### Fallback: Viewport Screenshots
 
-If the element doesn't have a clear ref, ensure the browser viewport shows only your target area:
-
-1. Use `browser_resize` to set viewport to component dimensions
-2. Scroll the element into view using `browser_evaluate`
-3. Take a viewport screenshot (no element/ref params)
+If the element doesn't have a clear ref, ensure the browser viewport shows only your target area by setting the viewport size appropriately before taking the screenshot.
 
 ### Example Workflow
 
-```
-1. browser_resize(width: 1200, height: 800)
-2. browser_navigate to page
-3. browser_snapshot to see element refs
-4. browser_take_screenshot(element: "Features grid", ref: "E45")
-5. [analyze and implement changes]
-6. browser_take_screenshot(element: "Features grid", ref: "E45")
-7. [repeat...]
+```bash
+agent-browser set viewport 1200 800
+agent-browser open http://localhost:3000
+agent-browser snapshot -i --json
+agent-browser screenshot 01-before.png
+# [analyze and implement changes]
+agent-browser open http://localhost:3000  # Reload after changes
+agent-browser screenshot 02-after.png
+# [repeat...]
 ```
 
-**Never use `fullPage: true`** - it captures unnecessary content and bloats context.
+**Never use `--full`** - it captures unnecessary content and bloats context.
 
 ## Design Principles to Apply
 

@@ -181,11 +181,14 @@ This command takes a work document (plan, specification, or todo file) and execu
    bin/dev  # Run in background
    ```
 
-   **Step 2: Capture screenshots with Playwright MCP tools**
-   - `browser_navigate` to go to affected pages
-   - `browser_resize` to set viewport (desktop or mobile as needed)
-   - `browser_snapshot` to verify page state
-   - `browser_take_screenshot` to capture images
+   **Step 2: Capture screenshots with agent-browser**
+   ```
+   skill: agent-browser
+   ```
+   - `agent-browser open <url>` to go to affected pages
+   - `agent-browser set viewport <w> <h>` to set viewport (desktop or mobile as needed)
+   - `agent-browser snapshot -i --json` to verify page state
+   - `agent-browser screenshot <path>` to capture images
 
    **Step 3: Upload using imgup skill**
    ```bash

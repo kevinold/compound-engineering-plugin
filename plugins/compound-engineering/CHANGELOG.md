@@ -5,6 +5,40 @@ All notable changes to the compound-engineering plugin will be documented in thi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.24.0] - 2026-01-14
+
+### Breaking Changes
+
+- **Removed Playwright MCP server** - Browser automation now uses `agent-browser` CLI instead of Playwright MCP. This saves ~7,000 tokens per conversation (two duplicate MCP servers were loading).
+
+### Added
+
+- **`agent-browser` skill** - New skill teaching how to use the agent-browser CLI for browser automation:
+  - Pre-flight check for installation
+  - Core workflow (open, snapshot, click/fill, re-snapshot)
+  - Session persistence for maintaining browser state
+  - Common workflows for screenshots, forms, and error checking
+
+### Changed
+
+- **`/playwright-test` command** - Updated to use agent-browser CLI
+- **`/feature-video` command** - Updated to use agent-browser CLI
+- **`/reproduce-bug` command** - Updated to use agent-browser CLI
+- **`/workflows:work` command** - Updated screenshot section to use agent-browser
+- **`design-iterator` agent** - Updated screenshot workflow to use agent-browser
+
+### Migration
+
+Users who relied on Playwright MCP tools need to:
+1. Install agent-browser: `npm install -g agent-browser && agent-browser install`
+2. Load the skill before using browser automation: `skill: agent-browser`
+
+### Summary
+
+- 27 agents, 22 commands, 14 skills, 1 MCP server
+
+---
+
 ## [2.23.2] - 2026-01-09
 
 ### Changed

@@ -22,9 +22,14 @@ This command tests affected pages in a real browser, catching issues that unit t
 
 <requirements>
 - Local development server running (e.g., `bin/dev`, `rails server`)
-- Playwright MCP server connected
+- `agent-browser` CLI installed (`npm install -g agent-browser && agent-browser install`)
 - Git repository with changes to test
 </requirements>
+
+**Load the agent-browser skill first:**
+```
+skill: agent-browser
+```
 
 ## Main Tasks
 
@@ -77,9 +82,9 @@ Build a list of URLs to test based on the mapping.
 
 Before testing, verify the local server is accessible:
 
-```
-mcp__playwright__browser_navigate({ url: "http://localhost:3000" })
-mcp__playwright__browser_snapshot({})
+```bash
+agent-browser open http://localhost:3000
+agent-browser snapshot -i --json
 ```
 
 If server is not running, inform user:
@@ -102,14 +107,14 @@ Then run `/playwright-test` again.
 For each affected route:
 
 **Step 1: Navigate and capture snapshot**
-```
-mcp__playwright__browser_navigate({ url: "http://localhost:3000/[route]" })
-mcp__playwright__browser_snapshot({})
+```bash
+agent-browser open http://localhost:3000/[route]
+agent-browser snapshot -i --json
 ```
 
 **Step 2: Check for errors**
-```
-mcp__playwright__browser_console_messages({ level: "error" })
+```bash
+agent-browser errors
 ```
 
 **Step 3: Verify key elements**
@@ -119,9 +124,9 @@ mcp__playwright__browser_console_messages({ level: "error" })
 - Forms have expected fields
 
 **Step 4: Test critical interactions (if applicable)**
-```
-mcp__playwright__browser_click({ element: "[description]", ref: "[ref]" })
-mcp__playwright__browser_snapshot({})
+```bash
+agent-browser click @[ref]
+agent-browser snapshot -i --json
 ```
 
 </test_pages>
