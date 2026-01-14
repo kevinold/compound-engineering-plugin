@@ -5,6 +5,18 @@ All notable changes to the compound-engineering plugin will be documented in thi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.24.1] - 2026-01-14
+
+### Changed
+
+- **`agent-browser` skill** - Improved description for better discoverability. Added action-oriented trigger keywords (taking screenshots, navigating URLs, clicking elements) and explicit guidance to use instead of Playwright MCP or npx playwright.
+
+### Summary
+
+- 27 agents, 22 commands, 14 skills, 1 MCP server
+
+---
+
 ## [2.24.0] - 2026-01-14
 
 ### Breaking Changes

@@ -1,6 +1,6 @@
 ---
 name: agent-browser
-description: This skill should be used when browser automation is needed for testing, screenshots, design iteration, or bug reproduction. It teaches how to use the agent-browser CLI for refs-based browser interaction.
+description: This skill should be used for browser automation - taking screenshots, navigating URLs, clicking elements, filling forms, checking console errors, or testing UI. Use instead of Playwright MCP or npx playwright. Provides the agent-browser CLI.
 ---
 
 # agent-browser CLI
